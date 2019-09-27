@@ -1,2 +1,4 @@
-# CS211-TextEditor
-Template repository for text editing application in CS 211
+Be sure to put the following DEFINE at the top of your main.cpp file!
+```
+#define PDC_DLL_BUILD 1
+```
