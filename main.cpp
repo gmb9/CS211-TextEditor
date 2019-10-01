@@ -196,17 +196,13 @@ int main(int argc, char* argv[])
 	int start = 0;
 	int textx = 0;
 	int texty = 0;
+	int enterTextX = 0;
 	string line;
 	vector<string> v1{};
 
-	//my_str.c_str()
-
 	//outputting file information to window
-	int test = KEY_F(1);
 	do 
 	{
-		//wclear(text_win);
-
 		if (input == KEY_F(1))
 		{
 			ifstream myfile;
@@ -231,7 +227,7 @@ int main(int argc, char* argv[])
 			myfile.close();
 		}
 
-		//Scrolls down
+		//Scrolls down FROM FILE
 		if (input == KEY_DOWN)
 		{
 			wclear(text_win);
@@ -256,7 +252,7 @@ int main(int argc, char* argv[])
 			refresh();
 		}
 
-		//Scrolls up
+		//Scrolls up FROM FILE
 		if (input == KEY_UP)
 		{
 			wclear(text_win);
@@ -278,16 +274,66 @@ int main(int argc, char* argv[])
 				}
 			}
 			refresh();
+			
 		}
 
-		if (input == ENTER_KEY)
-		{
-			texty++;
-			textx = 0;
-		}
-		else if (input >= 'a' && input <= 'z' || input >= 'A' && input <= 'Z')
+		vector<char> save{};
+
+		//allows for typing of a-z, A-Z, and 0-9
+		if (input >= 'a' && input <= 'z' || input >= 'A' && input <= 'Z' || input >= '0' && input <= '9')
 		{
 			mvwaddch(text_win, texty, textx, input);
+			textx++;
+			save.push_back(input);
+		}
+		else if (input == ALT_S)
+		{
+			ofstream writeFile;
+			writeFile.open("writeFile.txt");
+			if (writeFile.is_open())
+			{
+				for (int i = 0; i < save.size(); i++)
+				{
+					writeFile << save[i];
+				}
+			}
+
+			writeFile.close();
+			
+		}
+		//pushes cursor down 1 line, saves that x value, and resets x to 0
+		else if(input == ENTER_KEY)
+		{
+			texty++;
+			enterTextX = textx;
+			textx = 0;
+		}
+		//backspace
+		else if (input == KEY_DC)
+		{
+			mvwaddch(text_win, texty, textx - 1, ' ');
+			
+			//if it's at the start of the line, it will push it back
+			//up a line and set it to the x value of that previous line
+			if (textx == 0)
+			{
+				//delete row if on edge of row
+				texty--;
+				//reset x to row above
+				textx = enterTextX;
+			}
+			//moves x back a column
+			else
+			{
+				textx--;
+			}
+		}
+		else if (input == KEY_LEFT)
+		{
+			textx--;
+		}
+		else if (input == KEY_RIGHT)
+		{
 			textx++;
 		}
 
@@ -295,14 +341,6 @@ int main(int argc, char* argv[])
 		input = getch();
 
 	} while ((input != KEY_F(9)));
-
-
-
-	//fun stuff ends here
-
-	//tells curses to draw
-	//refresh();
-	//char result = getch();
 
 	//revert back to normal console mode
 	nodelay(main_window, TRUE);
