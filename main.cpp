@@ -200,6 +200,17 @@ int main(int argc, char* argv[])
 	string line;
 	vector<string> v1{};
 
+	vector<vector<int>> data{};
+	for (int i = 0; i < num_rows - 7; i++)
+	{
+		data.push_back(vector<int>{});
+		data[i].resize(num_cols - 3);
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			data[i][j] = -1;
+		}
+	}
+
 	//outputting file information to window
 	do 
 	{
@@ -276,15 +287,16 @@ int main(int argc, char* argv[])
 			refresh();
 			
 		}
-
-		vector<char> save{};
-
-		//allows for typing of a-z, A-Z, and 0-9
-		if (input >= 'a' && input <= 'z' || input >= 'A' && input <= 'Z' || input >= '0' && input <= '9')
+		
+		//allows for typing of a-z, A-Z, 0-9, and ./!/@/#/$/% etc
+		if (input >= 32 && input <= 126)
 		{
 			mvwaddch(text_win, texty, textx, input);
+
+			//add char to vector of vectors
+			data[texty][textx] = input;
 			textx++;
-			save.push_back(input);
+
 		}
 		else if (input == ALT_S)
 		{
@@ -292,13 +304,23 @@ int main(int argc, char* argv[])
 			writeFile.open("writeFile.txt");
 			if (writeFile.is_open())
 			{
-				for (int i = 0; i < save.size(); i++)
+				//loop through vector
+				for (int i = 0; i < data.size(); i++)
 				{
-					writeFile << save[i];
+					for (int j = 0; j < data[i].size(); j++)
+					{
+						if (data[i][j] == -1)
+						{
+							continue;
+						}
+						writeFile << (char)data[i][j];
+					}
+					writeFile << endl;
 				}
 			}
 
 			writeFile.close();
+			wclear;
 			
 		}
 		//pushes cursor down 1 line, saves that x value, and resets x to 0
