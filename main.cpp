@@ -29,6 +29,7 @@ int main(int argc, char* argv[])
 	noecho();
 	//nodelay(main_window, TRUE);
 	//keypad(main_window, TRUE);
+	
 	curs_set(2);
 
 	if (has_colors() == FALSE) 
@@ -185,12 +186,13 @@ int main(int argc, char* argv[])
 
 	touchwin(main_window);
 	WINDOW* text_win = derwin(main_window, num_rows - 7, num_cols - 3, 3, 1);
+	keypad(text_win, TRUE);
 	touchwin(text_win);
 	wrefresh(text_win);
 
 	//detects when a user pressed F1 (KEY_F(1-9 or 0) for function keys), KEY_UP/DOWN/LEFT/RIGHT, etc and saves that as input
 	keypad(main_window, TRUE);
-	int input = getch();
+	int input = getch(text_win);
 	int x_loc = 0;
 	int y_loc = 0;
 	int start = 0;
@@ -339,7 +341,9 @@ int main(int argc, char* argv[])
 		//backspace
 		else if (input == KEY_DC)
 		{
-			mvwaddch(text_win, texty, textx - 1, ' ');
+			mvwaddch(text_win, texty, textx, ' ');
+			wmove(text_win, texty, textx - 1);
+			wrefresh(text_win);
 			
 			//if it's at the start of the line, it will push it back
 			//up a line and set it to the x value of that previous line
@@ -355,6 +359,8 @@ int main(int argc, char* argv[])
 				else
 				{
 					mvwaddch(text_win, texty, textx, ' ');
+					wmove(text_win, texty, textx);
+					wrefresh(text_win);
 				}
 			}
 			//moves x back a column
@@ -363,19 +369,27 @@ int main(int argc, char* argv[])
 				textx--;
 			}
 		}
+		//allows user to move backwards in their text to edit previously typed things
 		else if (input == KEY_LEFT)
 		{
 			textx--;
 			wmove(text_win, texty, textx);
+			wrefresh(text_win);
 		}
+		//allows user to move forwards
 		else if (input == KEY_RIGHT)
 		{
-			textx++;
-			wmove(text_win, texty, textx);
+			if (textx < num_cols - 4)
+			{
+				textx++;
+				wmove(text_win, texty, textx);
+				wrefresh(text_win);
+			}
+			
 		}
 
 		wrefresh(text_win);
-		input = getch();
+		input = wgetch(text_win);
 
 	} while ((input != KEY_F(9)));
 
