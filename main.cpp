@@ -297,6 +297,12 @@ int main(int argc, char* argv[])
 			data[texty][textx] = input;
 			textx++;
 
+			if (textx > num_cols - 4)
+			{
+				texty++;
+				textx = enterTextX;
+				textx = 0;
+			}
 		}
 		else if (input == ALT_S)
 		{
