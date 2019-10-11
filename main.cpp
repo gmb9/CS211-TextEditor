@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 	//turn off key echo
 	noecho();
 	//nodelay(main_window, TRUE);
-	keypad(main_window, TRUE);
+	//keypad(main_window, TRUE);
 	curs_set(2);
 
 	if (has_colors() == FALSE) 
@@ -345,10 +345,17 @@ int main(int argc, char* argv[])
 			//up a line and set it to the x value of that previous line
 			if (textx == 0)
 			{
-				//delete row if on edge of row
-				texty--;
-				//reset x to row above
-				textx = enterTextX;
+				if (texty != 0)
+				{
+					//delete row if on edge of row
+					texty--;
+					//reset x to row above
+					textx = enterTextX;
+				}
+				else
+				{
+					mvwaddch(text_win, texty, textx, ' ');
+				}
 			}
 			//moves x back a column
 			else
@@ -359,10 +366,12 @@ int main(int argc, char* argv[])
 		else if (input == KEY_LEFT)
 		{
 			textx--;
+			wmove(text_win, texty, textx);
 		}
 		else if (input == KEY_RIGHT)
 		{
 			textx++;
+			wmove(text_win, texty, textx);
 		}
 
 		wrefresh(text_win);
