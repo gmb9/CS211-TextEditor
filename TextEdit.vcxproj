@@ -33,6 +33,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="keywords.txt" />
     <Text Include="myfile.txt" />
     <Text Include="writeFile.txt" />
   </ItemGroup>
