@@ -1,5 +1,7 @@
 #define PDC_DLL_BUILD 1
 #include "curses.h"
+#include "TrieNode.h"
+#include "Trie.h"
 #include <string>
 #include <fstream>
 #include <vector>
@@ -8,112 +10,25 @@
 
 using namespace std;
 
-unsigned char border_char = 219;
-
-class TrieNode
-{
-private:
-	char _data;
-	unordered_map<char, TrieNode*> _children;
-
-	//For our Trie, we are using the character '$' as a sentinel
-	//value to mark the end of a word.
-	static const char _sentinel = '$';
-
-public:
-	TrieNode(const char& data = '\0')
-	{
-		setValue(data);
-	}
-
-	void setValue(const char& data)
-	{
-		_data = toupper(data);
-	}
-
-	const char& getValue() const
-	{
-		return _data;
-	}
-
-	char& getValue()
-	{
-		return _data;
-	}
-
-	//Returns true if the current Trie node represents the end of
-	//a word.
-	bool isWord() const
-	{
-		_children.find(_sentinel) != _children.end();
-	}
-
-	//Returns true when the current Trie node has the value of 
-	//the sentiel node
-	bool isSentinel() const
-	{
-		return _data == _sentinel;
-	}
-
-	//returns true when the Trie node has at least one child
-	bool hasChild(char index) const
-	{
-		return _children.find(index) != _children.end();
-	}
-
-	void setChild(char index, TrieNode* node)
-	{
-		_children[index] = node;
-	}
-
-	TrieNode* getChild(char index)
-	{
-		return _children[index];
-	}
-
-	//returns a list of children.
-	unordered_map<char, TrieNode*> getChildren()
-	{
-		return _children;
-	}
-
-};
-
-class Trie
-{
-private:
-	TrieNode*_root = nullptr;
-
-protected:
-
-public:
-	Trie()
-	{
-		_root = new TrieNode{};
-	}
-
-	virtual ~Trie()
-	{
-		//TODO: clean up memory
-	}
-
-	//TODO: implement
-	void addWord(const string& word)
-	{
-		
-	}
-
-	//TODO: implement
-	vector<string> search(const string& word)
-	{
-		vector<string> matches;
-		return matches;
-	}
-};
-
+//unsigned char border_char = 219;
 
 int main(int argc, char* argv[])
 {
+	Trie dictionary;
+	
+
+	ifstream dictionaryFile;
+	dictionaryFile.open("keywords.txt");
+
+	while (dictionaryFile.good())
+	{
+		string line;
+		getline(dictionaryFile, line);
+		dictionary.addWord(line);
+	}
+
+	dictionaryFile.close();
+
 	WINDOW* main_window = nullptr;
 	refresh();
 
@@ -316,6 +231,8 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	
+
 	//outputting file information to window
 	do 
 	{
@@ -434,6 +351,10 @@ int main(int argc, char* argv[])
 			wclear;
 			
 		}
+		else if (input == ALT_Z)
+		{
+			
+		}
 		//pushes cursor down 1 line, saves that x value, and resets x to 0
 		else if(input == ENTER_KEY)
 		{
@@ -490,29 +411,83 @@ int main(int argc, char* argv[])
 			}
 			
 		}
+		else if (input == CTL_TAB)
+		{
+			
+		}
 
 		wrefresh(text_win);
 		input = wgetch(text_win);
 
 	} while ((input != KEY_F(9)));
 
-	Trie dictionary{};
-
-	string lines = "";
-	dictionary.addWord("abc");
-	dictionary.addWord("aabc");
-	dictionary.addWord("def");
-	vector<string> result = dictionary.search("a");
-
-	//expected result:  "abc", "aabc"
-	for (auto item : result)
-	{
-		//cout << item << endl;
-	}
+	
 
 	//revert back to normal console mode
 	nodelay(main_window, TRUE);
 	
 	mvaddstr(0, 0, "Press any key to continue...");
 	endwin();
+}
+
+void saveToBinaryFile(vector<vector<int>> data)
+{
+	unordered_map<string, int> wordFrequency;
+	vector<vector<string>> words;
+
+	string word = "";
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			/*if (data[i][j] > 32 && data[i][j] < 38)
+			{
+				wordFrequency[word]++;
+				word = "";
+				wordFrequency[to_string((char)data[i][j])]++;
+			}
+			else if (data[i][j] > 40 && data[i][j] < 44)
+			{
+				wordFrequency[word]++;
+				word = "";
+				wordFrequency[to_string((char)data[i][j])]++;
+			}
+			else if (data[i][j] > 46 && data[i][j] < 47)
+			{
+				wordFrequency[word]++;
+				word = "";
+				wordFrequency[to_string((char)data[i][j])]++;
+			}
+			else if (data[i][j] > 58 && data[i][j] < 64)
+			{
+				wordFrequency[word]++;
+				word = "";
+				wordFrequency[to_string((char)data[i][j])]++;
+			}
+			else if (data[i][j] > 91 && data[i][j] < 96)
+			{
+				wordFrequency[word]++;
+				word = "";
+				wordFrequency[to_string((char)data[i][j])]++;
+			}
+			else if (data[i][j] > 123 && data[i][j] < 126)
+			{
+				wordFrequency[word]++;
+				word = "";
+				wordFrequency[to_string((char)data[i][j])]++;*/
+
+			if(data[i][j] == ' ')
+			{
+				wordFrequency[word]++;
+				word = "";
+			}
+			else
+			{
+				word += data[i][j];
+			}
+		}
+	}
+	wordFrequency[word]++;
+	word = "";
 }
