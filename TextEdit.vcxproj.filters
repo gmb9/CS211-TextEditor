@@ -45,9 +45,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="myfile.txt">
@@ -57,6 +54,12 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="keywords.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="binaryFile.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="binaryFileNew.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

@@ -2,13 +2,18 @@
 #include "curses.h"
 #include "TrieNode.h"
 #include "Trie.h"
+#include <algorithm>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+#include <queue>
 #define ENTER_KEY 10
 
 using namespace std;
+
+void saveToBinaryFile(vector<vector<int>> data);
+string decimalConvert(int n);
 
 //unsigned char border_char = 219;
 
@@ -353,7 +358,7 @@ int main(int argc, char* argv[])
 		}
 		else if (input == ALT_Z)
 		{
-			
+			saveToBinaryFile(data);
 		}
 		//pushes cursor down 1 line, saves that x value, and resets x to 0
 		else if(input == ENTER_KEY)
@@ -413,7 +418,7 @@ int main(int argc, char* argv[])
 		}
 		else if (input == CTL_TAB)
 		{
-			
+			//walk back until find space or index 00
 		}
 
 		wrefresh(text_win);
@@ -433,9 +438,15 @@ int main(int argc, char* argv[])
 void saveToBinaryFile(vector<vector<int>> data)
 {
 	unordered_map<string, int> wordFrequency;
+	unordered_map<string, string> finalWord;
 	vector<vector<string>> words;
+	vector<string> englishWords;
+	priority_queue<pair<string, int>> sort;
+	int counter = 1;
 
 	string word = "";
+	string stringMax = "";
+	int intMax = 0;
 
 	for (int i = 0; i < data.size(); i++)
 	{
@@ -475,11 +486,13 @@ void saveToBinaryFile(vector<vector<int>> data)
 			{
 				wordFrequency[word]++;
 				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;*/
+				wordFrequency[to_string((char)data[i][j])]++;
+			}*/
 
 			if(data[i][j] == ' ')
 			{
 				wordFrequency[word]++;
+				englishWords.push_back(word);
 				word = "";
 			}
 			else
@@ -490,4 +503,62 @@ void saveToBinaryFile(vector<vector<int>> data)
 	}
 	wordFrequency[word]++;
 	word = "";
+
+	for (auto pair : wordFrequency)
+	{
+		sort.push(pair);
+	}
+
+	while (!sort.empty())
+	{
+		string word = sort.top().first;
+		int freq = sort.top().second;
+
+		finalWord[word] = decimalConvert(counter++);
+
+		sort.pop();
+	}
+
+	ofstream binaryFile;
+	binaryFile.open("binaryFile.txt");
+	if (binaryFile.is_open())
+	{
+		for (auto pair : finalWord)
+		{
+			binaryFile << pair.first;
+			binaryFile << " : ";
+			binaryFile << pair.second;
+			binaryFile << endl;
+		}
+	}
+	binaryFile.close();
+
+	ofstream binaryFileNew;
+	binaryFileNew.open("binaryFileNew.txt");
+	if (binaryFileNew.is_open())
+	{
+		for (auto word : englishWords)
+		{
+			binaryFileNew << finalWord[word] << " ";
+		}
+	}
+	binaryFileNew.close();
+}
+
+string decimalConvert(int n)
+{
+	vector<int> a;
+	string word = "";
+	for (int i = 0; n > 0; i++)
+	{
+		a.push_back(n % 2);
+		n /= 2;
+	}
+
+	for (auto characters : a)
+	{
+		word += to_string(characters);
+	}
+
+	return word;
 }
