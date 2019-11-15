@@ -15,6 +15,8 @@ using namespace std;
 void saveToBinaryFile(vector<vector<int>> data);
 string decimalConvert(int n);
 
+void sortWord(vector<vector<int>> data);
+
 //unsigned char border_char = 219;
 
 int main(int argc, char* argv[])
@@ -236,85 +238,9 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	
-
 	//outputting file information to window
 	do 
 	{
-		if (input == KEY_F(1))
-		{
-			ifstream myfile;
-			myfile.open("myfile.txt");
-			if (myfile.is_open())
-			{
-				while (myfile.good())
-				{
-					getline(myfile, line);
-					v1.push_back(line);
-				}
-
-				for (int i = start; i < num_rows - 4; i++)
-				{
-					if (y_loc < num_rows - 4)
-					{
-						mvwaddstr(text_win, y_loc, x_loc, v1[i].c_str());
-						y_loc++;
-					}
-				}
-			}
-			myfile.close();
-		}
-
-		//Scrolls down FROM FILE
-		if (input == KEY_DOWN)
-		{
-			wclear(text_win);
-			//Makes sure we aren't able to repeat lines past the file size
-			if (start + (num_rows - 6) < v1.size())
-			{
-				start++;
-			}
-			
-			y_loc = 0;
-			for (int i = start; i < num_rows - 4 + start; i++)
-			{
-				if (i < v1.size())
-				{
-					if (y_loc < num_rows - 4)
-					{
-						mvwaddstr(text_win, y_loc, x_loc, v1[i].c_str());
-						y_loc++;
-					}
-				}
-			}
-			refresh();
-		}
-
-		//Scrolls up FROM FILE
-		if (input == KEY_UP)
-		{
-			wclear(text_win);
-			if (start > 0)
-			{
-				start--;
-			}
-
-			y_loc = 0;
-			for (int i = start; i < num_rows - 4 + start; i++)
-			{
-				if (i < v1.size())
-				{
-					if (y_loc < num_rows - 4)
-					{
-						mvwaddstr(text_win, y_loc, x_loc, v1[i].c_str());
-						y_loc++;
-					}
-				}
-			}
-			refresh();
-			
-		}
-		
 		//allows for typing of a-z, A-Z, 0-9, and ./!/@/#/$/% etc
 		if (input >= 32 && input <= 126)
 		{
@@ -330,35 +256,6 @@ int main(int argc, char* argv[])
 				textx = enterTextX;
 				textx = 0;
 			}
-		}
-		else if (input == ALT_S)
-		{
-			ofstream writeFile;
-			writeFile.open("writeFile.txt");
-			if (writeFile.is_open())
-			{
-				//loop through vector
-				for (int i = 0; i < data.size(); i++)
-				{
-					for (int j = 0; j < data[i].size(); j++)
-					{
-						if (data[i][j] == -1)
-						{
-							continue;
-						}
-						writeFile << (char)data[i][j];
-					}
-					writeFile << endl;
-				}
-			}
-
-			writeFile.close();
-			wclear;
-			
-		}
-		else if (input == ALT_Z)
-		{
-			saveToBinaryFile(data);
 		}
 		//pushes cursor down 1 line, saves that x value, and resets x to 0
 		else if(input == ENTER_KEY)
@@ -416,9 +313,10 @@ int main(int argc, char* argv[])
 			}
 			
 		}
-		else if (input == CTL_TAB)
+		//converts input on screen to binary
+		else if (input == ALT_Z)
 		{
-			//walk back until find space or index 00
+			saveToBinaryFile(data);
 		}
 
 		wrefresh(text_win);
@@ -439,20 +337,119 @@ void saveToBinaryFile(vector<vector<int>> data)
 {
 	unordered_map<string, int> wordFrequency;
 	unordered_map<string, string> finalWord;
-	vector<vector<string>> words;
 	vector<string> englishWords;
 	priority_queue<pair<string, int>> sort;
 	int counter = 1;
 
 	string word = "";
-	string stringMax = "";
-	int intMax = 0;
 
 	for (int i = 0; i < data.size(); i++)
 	{
 		for (int j = 0; j < data[i].size(); j++)
 		{
-			/*if (data[i][j] > 32 && data[i][j] < 38)
+			if(data[i][j] == ' ')
+			{
+				wordFrequency[word]++;
+				englishWords.push_back(word);
+				word = "";
+			}
+			else if(data[i][j] != -1)
+			{
+				word += data[i][j];
+			}
+		}
+	}
+	wordFrequency[word]++;
+	englishWords.push_back(word);
+	word = "";
+
+	for (auto pair : wordFrequency)
+	{
+		sort.push(pair);
+	}
+
+	while (!sort.empty())
+	{
+		string word = sort.top().first;
+
+		finalWord[word] = decimalConvert(counter++);
+
+		sort.pop();
+	}
+
+	ofstream binaryFile;
+	binaryFile.open("binaryFile.txt");
+	if (binaryFile.is_open())
+	{
+		for (auto pair : wordFrequency)
+		{
+			binaryFile << pair.first << " : " << pair.second << endl;
+		}
+	}
+
+	binaryFile.close();
+
+	ofstream binaryFileNew;
+	binaryFileNew.open("binaryFileNew.txt");
+	if (binaryFileNew.is_open())
+	{
+		for (auto word : englishWords)
+		{
+			binaryFileNew << finalWord[word] << " ";
+		}
+	}
+
+	binaryFileNew.close();
+}
+
+string decimalConvert(int n)
+{
+	vector<int> a;
+	string word = "";
+	for (int i = 0; n > 0; i++)
+	{
+		a.push_back(n % 2);
+		n /= 2;
+	}
+
+	for (auto characters : a)
+	{
+		word += to_string(characters);
+	}
+
+	return word;
+}
+
+void sortWord(vector<vector<int>> data)
+{
+	vector<string> wordsToSort;
+	string word;
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			if (data[i][j] == ' ')
+			{
+				wordsToSort.push_back(word);
+				word = "";
+			}
+			else
+			{
+				word += data[i][j];
+			}
+		}
+	}
+
+	//sort(wordsToSort.begin(), wordsToSort.end(), mycomp);
+}
+
+//bool mycomp(string a, string b)
+//{
+//	return a < b;
+//}
+
+/*if (data[i][j] > 32 && data[i][j] < 38)
 			{
 				wordFrequency[word]++;
 				word = "";
@@ -488,77 +485,3 @@ void saveToBinaryFile(vector<vector<int>> data)
 				word = "";
 				wordFrequency[to_string((char)data[i][j])]++;
 			}*/
-
-			if(data[i][j] == ' ')
-			{
-				wordFrequency[word]++;
-				englishWords.push_back(word);
-				word = "";
-			}
-			else
-			{
-				word += data[i][j];
-			}
-		}
-	}
-	wordFrequency[word]++;
-	word = "";
-
-	for (auto pair : wordFrequency)
-	{
-		sort.push(pair);
-	}
-
-	while (!sort.empty())
-	{
-		string word = sort.top().first;
-		int freq = sort.top().second;
-
-		finalWord[word] = decimalConvert(counter++);
-
-		sort.pop();
-	}
-
-	ofstream binaryFile;
-	binaryFile.open("binaryFile.txt");
-	if (binaryFile.is_open())
-	{
-		for (auto pair : finalWord)
-		{
-			binaryFile << pair.first;
-			binaryFile << " : ";
-			binaryFile << pair.second;
-			binaryFile << endl;
-		}
-	}
-	binaryFile.close();
-
-	ofstream binaryFileNew;
-	binaryFileNew.open("binaryFileNew.txt");
-	if (binaryFileNew.is_open())
-	{
-		for (auto word : englishWords)
-		{
-			binaryFileNew << finalWord[word] << " ";
-		}
-	}
-	binaryFileNew.close();
-}
-
-string decimalConvert(int n)
-{
-	vector<int> a;
-	string word = "";
-	for (int i = 0; n > 0; i++)
-	{
-		a.push_back(n % 2);
-		n /= 2;
-	}
-
-	for (auto characters : a)
-	{
-		word += to_string(characters);
-	}
-
-	return word;
-}
