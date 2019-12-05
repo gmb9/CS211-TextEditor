@@ -319,6 +319,11 @@ int main(int argc, char* argv[])
 			saveToBinaryFile(data);
 		}
 
+		else if (input == ALT_C)
+		{
+			sortWord(data);
+		}
+
 		wrefresh(text_win);
 		input = wgetch(text_win);
 
@@ -434,15 +439,19 @@ void sortWord(vector<vector<int>> data)
 				wordsToSort.push_back(word);
 				word = "";
 			}
-			else
+			else if(data[i][j] != -1)
 			{
 				word += data[i][j];
 			}
 		}
 	}
+	wordsToSort.push_back(word);
+	word = "";
 
-	//sort(wordsToSort.begin(), wordsToSort.end(), mycomp);
+	sort(wordsToSort.begin(), wordsToSort.end());
 }
+
+
 
 //bool mycomp(string a, string b)
 //{
