@@ -1,10 +1,10 @@
 # Design Diary
 Use this space to talk about your process.  For inspiration, see [my prompts](../../../docs/sample_reflection.md) 
 
-This milestone was the most conceptually difficult for me thus far, but by the end I feel that I understand the Trie datastructure much better, and am glad I was able to get it somewhat finished. I say somewhat because, as it currently stands, my code has working functions that allow for auto completion of words using the text file provided, but due to my lack of knowledge of the pdcurses library, I don't know how to convert what I have into something that will work with my text editor.
+This is the most confident I've felt about a milestone in a while, and I'm really happy with my result. While I didn't get the decompression piece working, I did get the main assignment done and working nicely.
 
-It was very difficult finding time to work on the project with a midterm in this class, a midterm in my stats class, and the extended power outages, but having worked over the weekend and having spent some time with the tutors I am very glad that I was able to solve the data structure part of the problem.
+The biggest problems I ran into were very easy to solve, and were really just either simple mistakes or small overlooks in how my vectors and unordered maps were built. One main issue that I had trouble with was one word per document, the last word, getting random dead space characters added to the end of it, causing both the frequency count and the binary output to be wonky. The fix was simple though, and required only checking to make sure that the word being built wasn't adding that dead space to the end of it.
 
-I found that of the people I talked to about this assignment, most were able to figure out the data structure portion and work through things similar to how we solved the midterm questions, but implimenting things with pdcurses is when the most problems began to arise. 
+I am happy with how much of this milestone I did on my own, as well as with how I was able to take what I had used on the midterm and translate it to help me here, that being the code to separate my file into words, give them frequencies, and sort them based on said frequencies. While this exact code wasn't used on the midterm exam, I found similarities between a few of the questions and was able to translate what I had previously written and make it work with this milestone.
 
-Overall, this assignment has been interesting and challenging, but I think that previous class structures have been more beneficial for improving my knowledge of C++ and the data structures used in it. I would say that pdcurses has been more of a burden, and seems to bring a part of me away from learning the data structures and forces me to learn a new library that is very uncommon.
+The coming milestone on the surface level seems very straight forward, and I am excited to see what I can get done.

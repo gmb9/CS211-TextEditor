@@ -15,8 +15,25 @@ using namespace std;
 void saveToBinaryFile(vector<vector<int>> data);
 string decimalConvert(int n);
 
-void sortWord(vector<vector<int>> data);
+vector<string> insertionSortWord(vector<vector<int>> data);
+vector<string> selectionSortWord(vector<vector<int>> data);
+vector<string> bubbleSortWord(vector<vector<int>> data);
+vector<string> quickSortWord(vector<vector<int>> data);
 
+template <typename T>
+void insertionSort(vector<T>& data);
+
+template <typename T>
+void selectionSort(vector<T>& data);
+
+template <typename T>
+void bubbleSort(vector<T>& data);
+
+template <typename T>
+void sortHelper(vector<T>& data, int start_index, int end_index);
+
+template <typename T>
+void quickSort(vector<T>& data);
 //unsigned char border_char = 219;
 
 int main(int argc, char* argv[])
@@ -314,14 +331,76 @@ int main(int argc, char* argv[])
 			
 		}
 		//converts input on screen to binary
-		else if (input == ALT_Z)
+		else if (input == ALT_P)
 		{
 			saveToBinaryFile(data);
 		}
 
+		else if (input == ALT_Q)
+		{
+			wclear(text_win);
+			wrefresh(text_win);
+		}
+
+		else if (input == ALT_Z)
+		{
+			vector<string> result = insertionSortWord(data);
+			wclear(text_win);
+			wrefresh(text_win);
+
+			for (int i = 0; i < result.size(); i++)
+			{
+				for (int j = 0; j < result[i].length(); j++)
+				{
+					mvwaddch(text_win, i, j, result[i][j]);
+				}
+			}
+		}
+
+		else if (input == ALT_X)
+		{
+			vector<string> result = selectionSortWord(data);
+			wclear(text_win);
+			wrefresh(text_win);
+
+			for (int i = 0; i < result.size(); i++)
+			{
+				for (int j = 0; j < result[i].length(); j++)
+				{
+					mvwaddch(text_win, i, j, result[i][j]);
+				}
+			}
+		}
+
 		else if (input == ALT_C)
 		{
-			sortWord(data);
+			int x = 0;
+			vector<string> result = bubbleSortWord(data);
+			wclear(text_win);
+			wrefresh(text_win);
+			
+			for (int i = 0; i < result.size(); i++)
+			{
+				for (int j = 0; j < result[i].length(); j++)
+				{
+					mvwaddch(text_win, i, j, result[i][j]);
+				}
+			}
+		}
+
+		else if (input == ALT_V)
+		{
+			vector<string> result = quickSortWord(data);
+			wclear(text_win);
+			wrefresh(text_win);
+
+			for (int i = 0; i < result.size(); i++)
+			{
+				for (int j = 0; j < result[i].length(); j++)
+				{
+					mvwaddch(text_win, i, j, result[i][j]);
+				}
+			}
 		}
 
 		wrefresh(text_win);
@@ -338,6 +417,297 @@ int main(int argc, char* argv[])
 	endwin();
 }
 
+//ALT_Z
+vector<string> insertionSortWord(vector<vector<int>> data)
+{
+	vector<string> wordsToSort;
+	string word;
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			if (data[i][j] == ' ')
+			{
+				wordsToSort.push_back(word);
+				word = "";
+			}
+			else if (data[i][j] != -1)
+			{
+				word += data[i][j];
+			}
+		}
+	}
+	wordsToSort.push_back(word);
+	word = "";
+
+	insertionSort(wordsToSort);
+
+	return wordsToSort;
+}
+
+//ALT_X
+vector<string> selectionSortWord(vector<vector<int>> data)
+{
+	vector<string> wordsToSort;
+	string word;
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			if (data[i][j] == ' ')
+			{
+				wordsToSort.push_back(word);
+				word = "";
+			}
+			else if (data[i][j] != -1)
+			{
+				word += data[i][j];
+			}
+		}
+	}
+	wordsToSort.push_back(word);
+	word = "";
+
+	selectionSort(wordsToSort);
+
+	return wordsToSort;
+}
+
+//ALT_C
+vector<string> bubbleSortWord(vector<vector<int>> data)
+{
+	vector<string> wordsToSort;
+	string word;
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			if (data[i][j] == ' ')
+			{
+				wordsToSort.push_back(word);
+				word = "";
+			}
+			else if (data[i][j] != -1)
+			{
+				word += data[i][j];
+			}
+		}
+	}
+	wordsToSort.push_back(word);
+	word = "";
+
+	bubbleSort(wordsToSort);
+
+	return wordsToSort;
+}
+
+//ALT_V
+vector<string> quickSortWord(vector<vector<int>> data)
+{
+	vector<string> wordsToSort;
+	string word;
+
+	for (int i = 0; i < data.size(); i++)
+	{
+		for (int j = 0; j < data[i].size(); j++)
+		{
+			if (data[i][j] == ' ')
+			{
+				wordsToSort.push_back(word);
+				word = "";
+			}
+			else if (data[i][j] != -1)
+			{
+				word += data[i][j];
+			}
+		}
+	}
+	wordsToSort.push_back(word);
+	word = "";
+
+	quickSort(wordsToSort);
+
+	return wordsToSort;
+}
+
+//Insertion
+template <typename T>
+void insertionSort(vector<T>& data)
+{
+	for (int i = 1; i < data.size(); i++)
+		{
+			for (int j = i; j > 0; j--)
+			{
+				if (data[j] < data[j - 1])
+				{
+					T temp = data[j];
+					data[j] = data[j - 1];
+					data[j - 1] = temp;
+				}
+				else
+				{
+					//in correct position relative to
+					//sorted set of list
+
+					//This extra check ensures O(N) on sorted
+					//data
+					break;
+				}
+			}
+		}
+}
+
+
+//Selection
+template <typename T>
+void selectionSort(vector<T>& data)
+{
+	for (int i = 0; i < data.size(); i++)
+	{
+		int smallest_index = i;
+		for (int j = i + 1; j < data.size(); j++)
+		{
+			if (data[j] < data[smallest_index])
+			{
+				smallest_index = j;
+			}
+		}
+
+		T temp = data[i];
+		data[i] = data[smallest_index];
+		data[smallest_index] = temp;
+	}
+}
+
+//Bubble
+template <typename T>
+void bubbleSort(vector<T>& data)
+{
+	for (int i = 0; i < data.size(); i++)
+	{
+		bool has_swapped = false;
+		for (int j = 1; j < data.size() - i; j++)
+		{
+			if (data[j - 1] > data[j])
+			{
+				T temp = data[j - 1];
+				data[j - 1] = data[j];
+				data[j] = temp;
+				has_swapped = true;
+			}
+		}
+		if (has_swapped == false)
+		{
+			//data is sorted, break out of loop
+			break;
+		}
+	}
+}
+
+//Quick sort
+template <typename T>
+void sortHelper(vector<T>& data, int start_index, int end_index)
+{
+	//array of size 1 or smaller
+	if (end_index <= start_index)
+	{
+		return;
+	}
+
+	//array of size 2
+	if (end_index - start_index == 1)
+	{
+		if (data[end_index] < data[start_index])
+		{
+			T temp = data[end_index];
+			data[end_index] = data[start_index];
+			data[start_index] = temp;
+		}
+		return;
+	}
+
+	//must be size 3 or larger
+
+	//find pivot
+	T first_item = data[start_index];
+	T last_item = data[end_index];
+	int mid_index = (start_index + end_index) / 2;
+	T middle_item = data[mid_index];
+	int pivot_index = start_index;
+
+
+	if (
+		middle_item > first_item && middle_item < last_item //ex: 1 5 10
+		||
+		middle_item < first_item && middle_item > last_item //ex: 10 5 1
+		)
+	{
+		pivot_index = mid_index;
+	}
+	else if (
+		last_item > first_item && last_item < middle_item //ex: 1 10 5
+		||
+		last_item < first_item && last_item > middle_item //ex: 10 1 5
+		)
+	{
+		pivot_index = end_index;
+	}
+
+	//swap pivot with end index
+	T pivot_value = data[pivot_index];
+	data[pivot_index] = data[end_index];
+	data[end_index] = pivot_value;
+
+	/*
+	1. Define i = front_index; j = end_index - 1;
+	2. While data[i] < pivot AND i < j
+	a. i++
+	3. While data[j] > pivot and i < j
+	a. j--
+	4. if i != j
+	a. Swap(data[i], data[j])
+	b. GOTO #2
+	*/
+	int i = start_index;
+	int j = end_index - 1;
+	while (i < j)
+	{
+		while (data[i] < pivot_value && i < j)
+		{
+			i++;
+		}
+		while (data[j] >= pivot_value && i < j)
+		{
+			j--;
+		}
+		if (i < j)
+		{
+			T temp = data[i];
+			data[i] = data[j];
+			data[j] = temp;
+		}
+	}
+
+	//swap pivot back
+	T temp = data[i];
+	data[i] = pivot_value;
+	data[end_index] = temp;
+
+	//recursively repeat
+	sortHelper(data, start_index, i - 1);
+	sortHelper(data, i + 1, end_index);
+
+}
+
+template <typename T>
+void quickSort(vector<T>& data)
+{
+	sortHelper(data, 0, data.size() - 1);
+}
+
 void saveToBinaryFile(vector<vector<int>> data)
 {
 	unordered_map<string, int> wordFrequency;
@@ -352,13 +722,13 @@ void saveToBinaryFile(vector<vector<int>> data)
 	{
 		for (int j = 0; j < data[i].size(); j++)
 		{
-			if(data[i][j] == ' ')
+			if (data[i][j] == ' ')
 			{
 				wordFrequency[word]++;
 				englishWords.push_back(word);
 				word = "";
 			}
-			else if(data[i][j] != -1)
+			else if (data[i][j] != -1)
 			{
 				word += data[i][j];
 			}
@@ -424,73 +794,3 @@ string decimalConvert(int n)
 
 	return word;
 }
-
-void sortWord(vector<vector<int>> data)
-{
-	vector<string> wordsToSort;
-	string word;
-
-	for (int i = 0; i < data.size(); i++)
-	{
-		for (int j = 0; j < data[i].size(); j++)
-		{
-			if (data[i][j] == ' ')
-			{
-				wordsToSort.push_back(word);
-				word = "";
-			}
-			else if(data[i][j] != -1)
-			{
-				word += data[i][j];
-			}
-		}
-	}
-	wordsToSort.push_back(word);
-	word = "";
-
-	sort(wordsToSort.begin(), wordsToSort.end());
-}
-
-
-
-//bool mycomp(string a, string b)
-//{
-//	return a < b;
-//}
-
-/*if (data[i][j] > 32 && data[i][j] < 38)
-			{
-				wordFrequency[word]++;
-				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;
-			}
-			else if (data[i][j] > 40 && data[i][j] < 44)
-			{
-				wordFrequency[word]++;
-				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;
-			}
-			else if (data[i][j] > 46 && data[i][j] < 47)
-			{
-				wordFrequency[word]++;
-				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;
-			}
-			else if (data[i][j] > 58 && data[i][j] < 64)
-			{
-				wordFrequency[word]++;
-				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;
-			}
-			else if (data[i][j] > 91 && data[i][j] < 96)
-			{
-				wordFrequency[word]++;
-				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;
-			}
-			else if (data[i][j] > 123 && data[i][j] < 126)
-			{
-				wordFrequency[word]++;
-				word = "";
-				wordFrequency[to_string((char)data[i][j])]++;
-			}*/
